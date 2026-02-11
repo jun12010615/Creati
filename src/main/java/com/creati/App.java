@@ -1,10 +1,10 @@
-package creati;
+package com.creati;
 
 import com.formdev.flatlaf.intellijthemes.FlatArcIJTheme;
 
-import creati.ui.auth.AuthFrame;
-import creati.util.FontKit;
-import creati.util.UITheme;
+import com.creati.ui.auth.AuthFrame;
+import com.creati.util.FontKit;
+import com.creati.util.UITheme;
 
 import javax.swing.*;
 import java.awt.*;

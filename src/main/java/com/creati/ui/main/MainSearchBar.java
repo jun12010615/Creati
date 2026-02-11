@@ -1,12 +1,13 @@
-package creati.ui.main;
-
-import creati.util.FontKit;
-import creati.util.UITheme;
+package com.creati.ui.main;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import com.creati.util.FontKit;
+import com.creati.util.UITheme;
+
 import java.awt.*;
 import java.util.function.Consumer;
 

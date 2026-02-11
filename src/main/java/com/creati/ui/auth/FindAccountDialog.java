@@ -1,9 +1,9 @@
-package creati.ui.auth;
+package com.creati.ui.auth;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import creati.util.UITheme;
+import com.creati.util.UITheme;
 
 import java.awt.*;
 

@@ -1,4 +1,4 @@
-package creati.service;
+package com.creati.service;
 
 public class AuthService {
 

@@ -1,10 +1,11 @@
-package creati.ui.main;
-
-import creati.util.UITheme;
+package com.creati.ui.main;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import com.creati.util.UITheme;
+
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BaseMultiResolutionImage;

@@ -1,4 +1,4 @@
-package creati.util;
+package com.creati.util;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

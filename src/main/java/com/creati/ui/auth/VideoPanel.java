@@ -1,4 +1,4 @@
-package creati.ui.auth;
+package com.creati.ui.auth;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;

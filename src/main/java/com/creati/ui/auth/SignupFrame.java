@@ -1,10 +1,11 @@
-package creati.ui.auth;
-
-import creati.util.FontKit;
-import creati.util.UITheme;
+package com.creati.ui.auth;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import com.creati.util.FontKit;
+import com.creati.util.UITheme;
+
 import java.awt.*;
 import java.nio.file.Path;
 import java.util.Set;

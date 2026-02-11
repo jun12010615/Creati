@@ -1,8 +1,8 @@
-package creati.ui.auth;
+package com.creati.ui.auth;
 
-import creati.ui.main.MainFrame;
-import creati.util.FontKit;
-import creati.util.UITheme;
+import com.creati.ui.main.MainFrame;
+import com.creati.util.FontKit;
+import com.creati.util.UITheme;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

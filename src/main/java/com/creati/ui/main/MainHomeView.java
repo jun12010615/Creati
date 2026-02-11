@@ -1,15 +1,15 @@
-package creati.ui.main;
+package com.creati.ui.main;
 
-import creati.ui.main.MainUiParts.ChartCard;
-import creati.ui.main.MainUiParts.HomeCard;
-import creati.ui.main.MainUiParts.MiniBarChart;
-import creati.ui.main.MainUiParts.MiniLineChart;
-import creati.util.UITheme;
+import com.creati.ui.main.MainUiParts.ChartCard;
+import com.creati.ui.main.MainUiParts.HomeCard;
+import com.creati.ui.main.MainUiParts.MiniBarChart;
+import com.creati.ui.main.MainUiParts.MiniLineChart;
+import com.creati.util.UITheme;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import static creati.ui.main.MainUiParts.*;
+import static com.creati.ui.main.MainUiParts.*;
 
 import java.awt.*;
 import java.util.function.Supplier;

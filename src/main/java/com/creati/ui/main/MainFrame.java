@@ -1,16 +1,16 @@
-package creati.ui.main;
+package com.creati.ui.main;
 
-import creati.ui.main.MainUiParts.CircleAvatar;
-import creati.ui.main.MainUiParts.EllipsisButton;
-import creati.ui.main.MainUiParts.RoundedButton;
-import creati.ui.main.MainUiParts.ShadowLabel;
-import creati.util.FontKit;
-import creati.util.UITheme;
+import com.creati.ui.main.MainUiParts.CircleAvatar;
+import com.creati.ui.main.MainUiParts.EllipsisButton;
+import com.creati.ui.main.MainUiParts.RoundedButton;
+import com.creati.ui.main.MainUiParts.ShadowLabel;
+import com.creati.util.FontKit;
+import com.creati.util.UITheme;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import static creati.ui.main.MainUiParts.*;
+import static com.creati.ui.main.MainUiParts.*;
 
 import java.awt.*;
 import java.nio.file.Path;
