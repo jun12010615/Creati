@@ -14,21 +14,21 @@ public class FontKit {
         if (inited) return;
 
         // assets/fonts에 넣은 Pretendard 9종 사용
-        load("Thin", "/main/resources/fonts/Pretendard-Thin.ttf");
-        load("ExtraLight", "/main/resources/fonts/Pretendard-ExtraLight.ttf");
-        load("Light", "/main/resources/fonts/Pretendard-Light.ttf");
-        load("Regular", "/main/resources/fonts/Pretendard-Regular.ttf");
-        load("Medium", "/main/resources/fonts/Pretendard-Medium.ttf");
-        load("SemiBold", "/main/resources/fonts/Pretendard-SemiBold.ttf");
-        load("Bold", "/main/resources/fonts/Pretendard-Bold.ttf");
-        load("ExtraBold", "/main/resources/fonts/Pretendard-ExtraBold.ttf");
-        load("Black", "/main/resources/fonts/Pretendard-Black.ttf");
+        load("Thin", "/fonts/Pretendard-Thin.ttf");
+        load("ExtraLight", "/fonts/Pretendard-ExtraLight.ttf");
+        load("Light", "/fonts/Pretendard-Light.ttf");
+        load("Regular", "/fonts/Pretendard-Regular.ttf");
+        load("Medium", "/fonts/Pretendard-Medium.ttf");
+        load("SemiBold", "/fonts/Pretendard-SemiBold.ttf");
+        load("Bold", "/fonts/Pretendard-Bold.ttf");
+        load("ExtraBold", "/fonts/Pretendard-ExtraBold.ttf");
+        load("Black", "/fonts/Pretendard-Black.ttf");
         
         // 로고용 esamanru
-        load("EsamanruBold", "/main/resources/fonts/esamanru-Bold.ttf");
+        load("EsamanruBold", "/fonts/esamanru-Bold.ttf");
 
      // Material Icons
-        load("MaterialIcons", "/main/resources/fonts/MaterialIcons-Regular.ttf");
+        load("MaterialIcons", "/fonts/MaterialIcons-Regular.ttf");
 
         inited = true;
     }
