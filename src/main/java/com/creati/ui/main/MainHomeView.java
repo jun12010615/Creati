@@ -1,10 +1,14 @@
 package com.creati.ui.main;
 
+import com.creati.service.GptAnalysisService;
 import com.creati.ui.main.MainUiParts.ChartCard;
 import com.creati.ui.main.MainUiParts.HomeCard;
 import com.creati.ui.main.MainUiParts.MiniBarChart;
 import com.creati.ui.main.MainUiParts.MiniLineChart;
 import com.creati.util.UITheme;
+
+import com.creati.service.GptAnalysisService;
+import com.creati.ui.main.GptResultDialog; 
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -21,7 +25,9 @@ import java.util.function.Supplier;
  * - 월간 AI 인사이트
  */
 public class MainHomeView extends JPanel {
-
+	
+	private final GptAnalysisService gptService = new GptAnalysisService();
+	
     private static final Color YELLOW_DARK = new Color(0xFFC107);
     private static final Color YELLOW_MID  = new Color(0xFFD54F);
     private static final Color YELLOW_SOFT = new Color(0xFFE082);
@@ -215,10 +221,10 @@ public class MainHomeView extends JPanel {
         genBtn.setFont(UITheme.BODY_MED);
         genBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        genBtn.addActionListener(e -> {
+       /* genBtn.addActionListener(e -> {
             // TODO(기능 연결): 월 1회 생성 제한 체크
             // TODO(기능 연결): 매월 1일 초기화 로직(서버/DB 연결)
-
+        	
             String text =
                     "이번 달은 기록의 시작은 빠르지만, 중간에 흐름이 끊기는 패턴이 보여요. "
                   + "특히 ‘시간 부족’과 ‘계획 미흡’이 함께 등장하면서 재도전까지 이어지지 못한 날이 있었어요.\n\n"
@@ -230,8 +236,36 @@ public class MainHomeView extends JPanel {
             insightSetter.accept(text);
             applyInsightText(insightArea);
             insightArea.setCaretPosition(0);
-        });
+        });*/
 
+        genBtn.addActionListener(e -> {
+            // 1. 즉각적인 UI 반응
+            insightSetter.accept("에티가 데이터를 분석 중입니다... ✨");
+            applyInsightText(insightArea);
+
+            // 2. 백그라운드 스레드 시작
+            new Thread(() -> {
+                try {
+                    // GPT API 호출
+                    String result = gptService.analyzeDummy(); 
+
+                    // 3. UI 업데이트는 다시 Swing 스레드에서 실행
+                    SwingUtilities.invokeLater(() -> {
+                        insightSetter.accept(result);
+                        applyInsightText(insightArea);
+                        
+                        // 결과 다이얼로그 띄우기
+                        JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+                        GptResultDialog dialog = new GptResultDialog(topFrame, "✨ 에티의 AI 컨설팅", result);
+                        dialog.setVisible(true);
+                    });
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    SwingUtilities.invokeLater(() -> insightSetter.accept("분석 중 오류가 발생했습니다."));
+                }
+            }).start();
+        });
+        
         body.add(hint);
         body.add(Box.createVerticalStrut(10));
         body.add(insightBox);
