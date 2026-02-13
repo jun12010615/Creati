@@ -13,7 +13,10 @@ import java.nio.file.Path;
 
 public class AuthFrame extends JFrame {
 
-	private static final Path VIDEO_PATH = Path.of("assets/videos/intro.mp4");
+	private static final Path VIDEO_PATH = Path.of(
+	    System.getProperty("user.dir"), 
+	    "src", "main", "resources", "videos", "intro.mp4"
+	);
 
 	private VideoPanel videoPanel;
 
