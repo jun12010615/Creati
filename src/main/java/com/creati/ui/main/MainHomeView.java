@@ -1,6 +1,7 @@
 package com.creati.ui.main;
 
 import com.creati.service.GptAnalysisService;
+import com.creati.service.StatService;
 import com.creati.ui.main.MainUiParts.ChartCard;
 import com.creati.ui.main.MainUiParts.HomeCard;
 import com.creati.ui.main.MainUiParts.MiniBarChart;
@@ -27,6 +28,7 @@ import java.util.function.Supplier;
 public class MainHomeView extends JPanel {
 	
 	private final GptAnalysisService gptService = new GptAnalysisService();
+	private final StatService statService = new StatService();
 	
     private static final Color YELLOW_DARK = new Color(0xFFC107);
     private static final Color YELLOW_MID  = new Color(0xFFD54F);
@@ -137,24 +139,29 @@ public class MainHomeView extends JPanel {
         body.setOpaque(false);
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
 
+        // 실패 원인 Top3
         JPanel chips = new JPanel(new GridLayout(1, 2, 10, 0));
         chips.setOpaque(false);
         chips.add(pill("실패 원인 Top3", "시간 부족 · 계획 미흡 · 집중 분산"));
         attachHeight(chips, 46);
 
+        // 실시간 반영을 위한 데이터 변수 (이 숫자만 바꾸면 UI에 반영됨)
+        int[] weeklyData = {4, 2, 6, 3, 20, 8, 7}; // 주간 기록 데이터
+        String[] categoryLabels = {"영상", "이미지", "글", "기타"};
+        int[] categoryValues = {50, 25, 15, 10}; // 카테고리 비율 데이터
+
         JPanel charts = new JPanel(new GridLayout(2, 1, 0, 12));
         charts.setOpaque(false);
 
+        // 주간 기록 추이
         ChartCard lineCard = new ChartCard("주간 기록 추이");
-        lineCard.setChart(new MiniLineChart(new int[]{2, 3, 1, 4, 3, 5, 4}));
-        lineCard.setHint("최근 7일 동안 기록 흐름을 보여줘요.");
+        lineCard.setChart(new MiniLineChart(weeklyData)); // 데이터 주입
+        lineCard.setHint("최근 7일간 준일 님의 기록 흐름입니다.");
 
+        // 카테고리 비율
         ChartCard barCard = new ChartCard("카테고리 비율");
-        barCard.setChart(new MiniBarChart(
-                new String[]{"영상", "이미지", "글", "기타"},
-                new int[]{42, 30, 18, 10}
-        ));
-        barCard.setHint("카테고리별 비율을 한눈에 확인해요.");
+        barCard.setChart(new MiniBarChart(categoryLabels, categoryValues)); // 데이터 주입
+        barCard.setHint("어떤 분야에 가장 많이 도전했는지 보여줘요.");
 
         charts.add(lineCard);
         charts.add(barCard);
@@ -239,17 +246,17 @@ public class MainHomeView extends JPanel {
         });*/
 
         genBtn.addActionListener(e -> {
-            // 1. 즉각적인 UI 반응
+            // 즉각적인 UI 반응
             insightSetter.accept("에티가 데이터를 분석 중입니다... ✨");
             applyInsightText(insightArea);
 
-            // 2. 백그라운드 스레드 시작
+            // 백그라운드 스레드 시작
             new Thread(() -> {
                 try {
                     // GPT API 호출
                     String result = gptService.analyzeDummy(); 
 
-                    // 3. UI 업데이트는 다시 Swing 스레드에서 실행
+                    // UI 업데이트는 다시 Swing 스레드에서 실행
                     SwingUtilities.invokeLater(() -> {
                         insightSetter.accept(result);
                         applyInsightText(insightArea);
