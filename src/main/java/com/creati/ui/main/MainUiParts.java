@@ -59,57 +59,125 @@ public class MainUiParts {
         }
     }
 
-        static class ChartCard extends JPanel {
-            private final JPanel chartHolder = new JPanel(new BorderLayout());
-            private final JLabel hint = new JLabel(" ");
+    static class ChartCard extends JPanel {
+        private final JPanel chartHolder = new JPanel(new BorderLayout());
+        private final JLabel hint = new JLabel(" ");
+        private final JLabel valueLabel = new JLabel(""); 
 
-            ChartCard(String title) {
-                super(new BorderLayout());
-                setOpaque(true);
-                setBackground(new Color(250, 250, 252));
-                setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(235, 235, 242), 1, true),
-                        new EmptyBorder(12, 12, 12, 12)
-                ));
+        ChartCard(String title) {
+            super(new BorderLayout());
+            setOpaque(true);
+            setBackground(new Color(250, 250, 252));
+            setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(235, 235, 242), 1, true),
+                    new EmptyBorder(12, 12, 12, 12)
+            ));
 
-                JLabel t = new JLabel(title);
-                t.setFont(UITheme.BODY_MED);
-                t.setForeground(UITheme.TEXT);
+            // 타이틀 라벨
+            JLabel t = new JLabel(title);
+            t.setFont(UITheme.BODY_MED);
+            t.setForeground(UITheme.TEXT);
 
-                hint.setFont(UITheme.CAPTION);
-                hint.setForeground(new Color(140, 140, 140));
+            valueLabel.setFont(UITheme.H2 != null ? UITheme.H2.deriveFont(20f) : new Font("Dialog", Font.BOLD, 20));
+            valueLabel.setForeground(UITheme.ACCENT_PURPLE);
 
-                JPanel header = new JPanel(new BorderLayout(10, 0));
-                header.setOpaque(false);
-                header.add(t, BorderLayout.WEST);
-                header.add(hint, BorderLayout.EAST);
+            hint.setFont(UITheme.CAPTION);
+            hint.setForeground(new Color(140, 140, 140));
 
-                chartHolder.setOpaque(false);
-                chartHolder.setBorder(new EmptyBorder(10, 0, 0, 0));
+            JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+            titlePanel.setOpaque(false);
+            titlePanel.add(t);
+            titlePanel.add(valueLabel);
 
-                add(header, BorderLayout.NORTH);
-                add(chartHolder, BorderLayout.CENTER);
+            JPanel header = new JPanel(new BorderLayout());
+            header.setOpaque(false);
+            header.add(titlePanel, BorderLayout.WEST);
+            header.add(hint, BorderLayout.EAST);
 
-                setPreferredSize(new Dimension(10, 260));
-            }
+            chartHolder.setOpaque(false);
+            chartHolder.setBorder(new EmptyBorder(10, 0, 0, 0));
 
-            void setChart(JComponent chart) {
-                chartHolder.removeAll();
-                chartHolder.add(chart, BorderLayout.CENTER);
-            }
+            add(header, BorderLayout.NORTH);
+            add(chartHolder, BorderLayout.CENTER);
 
-            void setHint(String text) {
-                hint.setText(text);
+            setPreferredSize(new Dimension(10, 260));
+        }
+
+        /**
+         * 외부(MiniLineChart 등)에서 마우스 오버 시 숫자를 업데이트하기 위한 메서드
+         * @param val 표시할 문자열 (예: ": 3")
+         */
+        
+        public void updateValue(String val) {
+            valueLabel.setText(val);
+        }
+
+        void setChart(JComponent chart) {
+            chartHolder.removeAll();
+            chartHolder.add(chart, BorderLayout.CENTER);
+            
+            // 차트 컴포넌트에 이 카드의 참조를 전달하여 통신 가능하게 함
+            if (chart instanceof MiniLineChart) {
+                ((MiniLineChart) chart).setParentCard(this);
             }
         }
 
+        void setHint(String text) {
+            hint.setText(text);
+        }
+    }
+
     public static class MiniLineChart extends JComponent {
         private final int[] data;
+        private int hoverIndex = -1;
+        private ChartCard parentCard; // 부모 ChartCard 참조를 위한 변수
 
         public MiniLineChart(int[] data) {
             this.data = data;
             setOpaque(false);
             setPreferredSize(new Dimension(10, 120));
+
+            // 마우스 움직임에 따라 부모 카드의 숫자를 업데이트
+            addMouseMotionListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseMoved(java.awt.event.MouseEvent e) {
+                    int n = data.length;
+                    if (n == 0) return;
+
+                    int pad = 14;
+                    int gx0 = pad, gx1 = getWidth() - pad;
+                    double segmentW = (n == 1) ? 0 : (double) (gx1 - gx0) / (n - 1);
+                    int index = (segmentW == 0) ? 0 : (int) Math.round((e.getX() - gx0) / segmentW);
+
+                    if (index >= 0 && index < n) {
+                        if (hoverIndex != index) {
+                            hoverIndex = index;
+                            // 부모 카드가 설정되어 있다면 숫자를 ": 3" 형태로 전달
+                            if (parentCard != null) {
+                                parentCard.updateValue(": " + data[index]);
+                            }
+                            repaint();
+                        }
+                    }
+                }
+            });
+
+            // 마우스가 그래프 영역을 나가면 숫자를 초기화
+            addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseExited(java.awt.event.MouseEvent e) {
+                    hoverIndex = -1;
+                    if (parentCard != null) {
+                        parentCard.updateValue(""); // 숫자 숨김
+                    }
+                    repaint();
+                }
+            });
+        }
+
+        // ChartCard에서 자신을 등록할 때 사용하는 메서드
+        public void setParentCard(ChartCard card) {
+            this.parentCard = card;
         }
 
         @Override
@@ -121,6 +189,7 @@ public class MainUiParts {
             int w = getWidth();
             int h = getHeight();
 
+            // 배경 및 테두리
             g2.setColor(Color.WHITE);
             g2.fillRoundRect(0, 0, w, h, 16, 16);
             g2.setColor(new Color(230, 230, 238));
@@ -129,12 +198,7 @@ public class MainUiParts {
             int pad = 14;
             int gx0 = pad, gy0 = pad, gx1 = w - pad, gy1 = h - pad;
 
-            g2.setColor(new Color(242, 242, 248));
-            for (int i = 1; i <= 3; i++) {
-                int y = gy0 + (gy1 - gy0) * i / 4;
-                g2.drawLine(gx0, y, gx1, y);
-            }
-
+            // 데이터 좌표 계산
             int max = 1;
             for (int v : data) max = Math.max(max, v);
 
@@ -145,94 +209,141 @@ public class MainUiParts {
             for (int i = 0; i < n; i++) {
                 double tx = (n == 1) ? 0 : (double) i / (n - 1);
                 xs[i] = (int) (gx0 + (gx1 - gx0) * tx);
-
                 double ty = (double) data[i] / max;
                 ys[i] = (int) (gy1 - (gy1 - gy0) * ty);
             }
 
+            // 꺾은선 그리기
             g2.setStroke(new BasicStroke(2.2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
             g2.setColor(UITheme.ACCENT_PURPLE);
             for (int i = 0; i < n - 1; i++) {
                 g2.drawLine(xs[i], ys[i], xs[i + 1], ys[i + 1]);
             }
 
-            g2.setColor(Color.WHITE);
+            // 포인트(점) 그리기 및 호버 효과
             for (int i = 0; i < n; i++) {
-                g2.fillOval(xs[i] - 5, ys[i] - 5, 10, 10);
-            }
-            g2.setColor(UITheme.ACCENT_PURPLE);
-            for (int i = 0; i < n; i++) {
-                g2.drawOval(xs[i] - 5, ys[i] - 5, 10, 10);
-            }
+                boolean isHover = (i == hoverIndex);
+                int r = isHover ? 7 : 5; // 선택된 점은 더 크게
 
-            g2.dispose();
-        }
-    }
-
-    public static class MiniBarChart extends JComponent {
-        private final String[] labels;
-        private final int[] values;
-
-        public MiniBarChart(String[] labels, int[] values) {
-            this.labels = labels;
-            this.values = values;
-            setOpaque(false);
-            setPreferredSize(new Dimension(10, 120));
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-            int w = getWidth();
-            int h = getHeight();
-
-            g2.setColor(Color.WHITE);
-            g2.fillRoundRect(0, 0, w, h, 16, 16);
-            g2.setColor(new Color(230, 230, 238));
-            g2.drawRoundRect(0, 0, w - 1, h - 1, 16, 16);
-
-            int padX = 14;
-            int padTop = 14;
-            int padBottom = 24;
-
-            int gx0 = padX;
-            int gx1 = w - padX;
-            int gy0 = padTop;
-            int gy1 = h - padBottom;
-
-            int max = 1;
-            for (int v : values) max = Math.max(max, v);
-
-            int n = values.length;
-            int gap = 10;
-            int barW = Math.max(12, (gx1 - gx0 - gap * (n - 1)) / n);
-
-            int x = gx0;
-            for (int i = 0; i < n; i++) {
-                int v = values[i];
-                int bh = (int) ((gy1 - gy0) * (v / (double) max));
-                int y = gy1 - bh;
-
-                Color fill = (i % 2 == 0) ? UITheme.ACCENT_PURPLE : new Color(0xCFC9FF);
-                g2.setColor(fill);
-                g2.fillRoundRect(x, y, barW, bh, 10, 10);
-
-                g2.setColor(new Color(120, 120, 120));
-                g2.setFont(UITheme.CAPTION);
-                String lab = labels[i];
-                int tw = g2.getFontMetrics().stringWidth(lab);
-                int lx = x + (barW - tw) / 2;
-                g2.drawString(lab, lx, h - 8);
-
-                x += barW + gap;
+                if (isHover) {
+                    // 선택된 지점 강조 (보라색 원)
+                    g2.setColor(UITheme.ACCENT_PURPLE);
+                    g2.fillOval(xs[i] - r, ys[i] - r, r * 2, r * 2);
+                    
+                    // 수직 점선 가이드 추가 (선택 사항, 가독성 향상)
+                    g2.setStroke(new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{3}, 0));
+                    g2.drawLine(xs[i], gy0, xs[i], gy1);
+                } else {
+                    // 일반 점 (흰색 바탕 + 보라색 테두리)
+                    g2.setColor(Color.WHITE);
+                    g2.fillOval(xs[i] - r, ys[i] - r, r * 2, r * 2);
+                    g2.setColor(UITheme.ACCENT_PURPLE);
+                    g2.drawOval(xs[i] - r, ys[i] - r, r * 2, r * 2);
+                }
             }
 
             g2.dispose();
         }
     }
+
+        public static class MiniBarChart extends JComponent {
+            private final String[] labels;
+            private final int[] values;
+            private int hoverIndex = -1; // 마우스가 위치한 막대 인덱스
+
+            public MiniBarChart(String[] labels, int[] values) {
+                this.labels = labels;
+                this.values = values;
+                setOpaque(false);
+                setPreferredSize(new Dimension(10, 120));
+
+                addMouseMotionListener(new java.awt.event.MouseAdapter() {
+                    @Override
+                    public void mouseMoved(java.awt.event.MouseEvent e) {
+                        int n = values.length;
+                        int padX = 14;
+                        int gap = 10;
+                        int barW = Math.max(12, (getWidth() - padX * 2 - gap * (n - 1)) / n);
+
+                        // 마우스 X좌표를 기준으로 어떤 막대 위에 있는지 계산
+                        int index = (e.getX() - padX) / (barW + gap);
+                        
+                        if (index >= 0 && index < n) {
+                            // 실제 막대의 가로 범위 안에 있는지 체크
+                            int barStart = padX + index * (barW + gap);
+                            if (e.getX() >= barStart && e.getX() <= barStart + barW) {
+                                if (hoverIndex != index) {
+                                    hoverIndex = index;
+                                    repaint();
+                                }
+                                return;
+                            }
+                        }
+                        if (hoverIndex != -1) {
+                            hoverIndex = -1;
+                            repaint();
+                        }
+                    }
+                });
+
+                addMouseListener(new java.awt.event.MouseAdapter() {
+                    @Override
+                    public void mouseExited(java.awt.event.MouseEvent e) {
+                        hoverIndex = -1;
+                        repaint();
+                    }
+                });
+            }
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+                int w = getWidth(), h = getHeight();
+                // 배경 (기존 코드 유지)
+                g2.setColor(Color.WHITE);
+                g2.fillRoundRect(0, 0, w, h, 16, 16);
+                g2.setColor(new Color(230, 230, 238));
+                g2.drawRoundRect(0, 0, w - 1, h - 1, 16, 16);
+
+                int padX = 14, padTop = 14, padBottom = 24;
+                int gx0 = padX, gy1 = h - padBottom;
+                int max = 1;
+                for (int v : values) max = Math.max(max, v);
+
+                int n = values.length, gap = 10;
+                int barW = Math.max(12, (w - padX * 2 - gap * (n - 1)) / n);
+
+                int x = gx0;
+                for (int i = 0; i < n; i++) {
+                    int v = values[i];
+                    int bh = (int) ((gy1 - padTop) * (v / (double) max));
+                    int y = gy1 - bh;
+
+                    // 호버 시 색상 강조
+                    boolean isHover = (i == hoverIndex);
+                    Color fill = (i % 2 == 0) ? UITheme.ACCENT_PURPLE : new Color(0xCFC9FF);
+                    if (isHover) fill = fill.darker();
+                    
+                    g2.setColor(fill);
+                    g2.fillRoundRect(x, y, barW, bh, 10, 10);
+
+                    // 텍스트 그리기
+                    g2.setColor(isHover ? UITheme.ACCENT_PURPLE : new Color(120, 120, 120));
+                    g2.setFont(isHover ? UITheme.CAPTION.deriveFont(Font.BOLD) : UITheme.CAPTION);
+                    String lab = isHover ? v + "%" : labels[i]; // 호버 시 % 수치 표시
+                    
+                    int tw = g2.getFontMetrics().stringWidth(lab);
+                    g2.drawString(lab, x + (barW - tw) / 2, h - 8);
+
+                    x += barW + gap;
+                }
+                g2.dispose();
+            }
+        }
 
     // =========================
     // Small UI parts
