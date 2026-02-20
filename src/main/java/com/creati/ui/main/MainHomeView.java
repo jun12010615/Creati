@@ -2,13 +2,8 @@ package com.creati.ui.main;
 
 import com.creati.service.GptAnalysisService;
 import com.creati.service.StatService;
-import com.creati.ui.main.MainUiParts.ChartCard;
-import com.creati.ui.main.MainUiParts.HomeCard;
-import com.creati.ui.main.MainUiParts.MiniBarChart;
-import com.creati.ui.main.MainUiParts.MiniLineChart;
 import com.creati.util.UITheme;
 
-import com.creati.service.GptAnalysisService;
 import com.creati.ui.main.GptResultDialog; 
 
 import javax.swing.*;

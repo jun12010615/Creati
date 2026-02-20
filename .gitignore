@@ -33,3 +33,4 @@ replay_pid*
 
 # gemini key 
 .env
+.classpath
